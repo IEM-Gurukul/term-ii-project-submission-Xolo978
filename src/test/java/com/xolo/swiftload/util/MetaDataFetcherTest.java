@@ -1,5 +1,6 @@
 package com.xolo.swiftload.util;
 
+import com.xolo.swiftload.models.MetaData;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

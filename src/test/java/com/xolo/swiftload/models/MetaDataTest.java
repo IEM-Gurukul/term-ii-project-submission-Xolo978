@@ -1,4 +1,4 @@
-package com.xolo.swiftload.util;
+package com.xolo.swiftload.models;
 
 import org.junit.jupiter.api.Test;
 

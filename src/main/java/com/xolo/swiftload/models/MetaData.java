@@ -1,4 +1,4 @@
-package com.xolo.swiftload.util;
+package com.xolo.swiftload.models;
 
 public record MetaData(
         String fileName,

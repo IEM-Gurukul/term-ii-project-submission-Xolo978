@@ -28,4 +28,5 @@ SwiftLoad.iml
 .classpath
 .settings
 .project
+gradle.properties
 build/
