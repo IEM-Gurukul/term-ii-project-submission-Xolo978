@@ -4,8 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MetaDataFetcherTest {
     @Test
@@ -16,4 +15,15 @@ public class MetaDataFetcherTest {
         assertTrue(meta.fileName().contains("Avatar"));
         assertTrue(meta.fileSize()>0);
     }
+    @Test
+    void testUnreachableThrowException(){
+       String url = "https://notexist.in/idk.txt";
+       assertThrows(IOException.class , ()-> MetaDataFetcher.fetch(url));
+    }
+    @Test
+    void testInvalidUrlThrowsException(){
+        String url = "htttps://idk.com";
+        assertThrows(IllegalArgumentException.class , () -> MetaDataFetcher.fetch(url));
+    }
 }
+

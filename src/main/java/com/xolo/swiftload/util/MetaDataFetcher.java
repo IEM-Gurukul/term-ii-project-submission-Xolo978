@@ -5,13 +5,15 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MetaDataFetcher {
-    public static MetaData fetch(String url) throws IOException, InterruptedException {
+    public static MetaData fetch(String url) throws IOException, InterruptedException, IllegalArgumentException {
         try (HttpClient client = HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.ALWAYS)
+                .connectTimeout(Duration.ofSeconds(5))
                 .build()
         ) {
             URI uri = URI.create(url);
