@@ -6,14 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DownloadPartitioner {
-    public static List<DownloadPart> partition(long totalSize, int threadCount){
+    public static List<DownloadPart> partition(long fileSize, int threadCount){
        List<DownloadPart> parts = new ArrayList<>();
        long start = 0;
-       long chunkSize = totalSize/threadCount;
+       long chunkSize = fileSize/threadCount;
        long end;
        for(int i =0;i<threadCount;i++){
            if(i==threadCount-1){
-               end = totalSize-1;
+               end = fileSize-1;
            }
            else{
                end = start+chunkSize-1;
