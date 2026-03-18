@@ -2,7 +2,8 @@ package com.xolo.swiftload.models;
 
 public record MetaData(
         String fileName,
-        long fileSize
+        long fileSize,
+        boolean rangeSupport
 ){
     public String getFileSize(){
         if(fileSize<=0){
@@ -13,6 +14,6 @@ public record MetaData(
         }
         int exp = (int) (Math.log(fileSize)/Math.log(1024));
         char pre = "KMGTPE".charAt(exp-1);
-        return String.format("%.2f %cB", fileSize / Math.pow(1024, exp), pre); //Human redable format
+        return String.format("%.2f %cB", fileSize / Math.pow(1024, exp), pre); //Human readable format
     }
 }

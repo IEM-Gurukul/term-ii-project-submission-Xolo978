@@ -8,6 +8,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,8 +28,12 @@ public class MetaDataFetcher {
             long size = res.headers()
                     .firstValueAsLong("Content-Length")
                     .orElse(-1L);
+            String acceptRange = res.headers()
+                    .firstValue("Accept-Ranges")
+                    .orElse("")
+                    .toLowerCase();
             String fileName = getFileName(uri,res);
-            return new MetaData(fileName, size);
+            return new MetaData(fileName, size, acceptRange.contains("bytes"));
         }
     }
     private static String getFileName(URI url, HttpResponse<?> res){
