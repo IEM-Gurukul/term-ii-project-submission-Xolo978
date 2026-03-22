@@ -8,7 +8,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,20 +19,44 @@ public class MetaDataFetcher {
                 .build()
         ) {
             URI uri = URI.create(url);
-            HttpRequest req = HttpRequest.newBuilder()
+            HttpRequest req;
+             req = HttpRequest.newBuilder()
                     .uri(uri)
                     .HEAD()
+                    .header("User-Agent", "Mozilla/5.0")
                     .build();
-            HttpResponse<Void> res = client.send(req, HttpResponse.BodyHandlers.discarding());
+             HttpResponse<Void> res;
+             try{
+                 res = client.send(req, HttpResponse.BodyHandlers.discarding());
+             }catch(IOException e){
+                 req = HttpRequest.newBuilder()
+                         .uri(uri)
+                         .header("User-Agent", "Mozilla/5.0")
+                         .header("Range", "bytes=0-1")
+                         .GET()
+                         .build();
+                 res = client.send(req, HttpResponse.BodyHandlers.discarding());
+             }
+
             long size = res.headers()
                     .firstValueAsLong("Content-Length")
                     .orElse(-1L);
+             //Content range is returned when using get request
+             if(size<=2){
+                 String range = res.headers()
+                         .firstValue("Content-Range")
+                         .orElse("");
+                 if (range.contains("/")) {
+                     size = Long.parseLong(range.split("/")[1]);
+                 }
+             }
             String acceptRange = res.headers()
                     .firstValue("Accept-Ranges")
                     .orElse("")
                     .toLowerCase();
             String fileName = getFileName(uri,res);
-            return new MetaData(fileName, size, acceptRange.contains("bytes"));
+            //For GET req the server would return 206 status code
+            return new MetaData(fileName, size, acceptRange.contains("bytes") || res.statusCode() == 206);
         }
     }
     private static String getFileName(URI url, HttpResponse<?> res){
