@@ -1,5 +1,6 @@
 package com.xolo.swiftload.core;
 
+import com.xolo.swiftload.models.DownloadListener;
 import com.xolo.swiftload.models.DownloadPart;
 
 import java.io.IOException;
@@ -13,14 +14,16 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.concurrent.Callable;
 
-public class DownloadWorker implements Callable<Boolean> {
+public class DownloadWorker implements Callable<Boolean>{
      DownloadPart part;
      URI uri;
      Path savePath;
-    public DownloadWorker(DownloadPart part, String url, Path savePath){
+     DownloadListener listener;
+    public DownloadWorker(DownloadPart part, String url, Path savePath, DownloadListener listener){
         this.part = part;
         this.uri = URI.create(url);
         this.savePath = savePath;
+        this.listener = listener;
     }
     @Override
     public Boolean call() throws IOException, InterruptedException {
@@ -51,7 +54,11 @@ public class DownloadWorker implements Callable<Boolean> {
            int i;
            while((i =input.read(buffer))!=-1){
                file.write(buffer,0,i);
+               if(listener!=null){
+                   listener.onProgress(i);
+               }
            }
+           listener.onComplete(part.partId());
 
         }
     }
