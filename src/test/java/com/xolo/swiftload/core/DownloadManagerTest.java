@@ -18,8 +18,10 @@ public class DownloadManagerTest {
     @Test
     void download() throws IOException, ExecutionException, InterruptedException {
         DownloadListener testListener = new DownloadListener() {
-            @Override public void onProgress(long bytes) {}
-            @Override public void onFailure(int id, Throwable t) {}
+
+            @Override
+            public void onProgress(int partId, long bytesDownloaded) {
+            }
 
             @Override
             public void onMetaDataFetched(long fileSize) {}

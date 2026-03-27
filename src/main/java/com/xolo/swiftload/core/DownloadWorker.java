@@ -41,6 +41,9 @@ public class DownloadWorker implements Callable<Boolean>{
             if(res.statusCode()!=206){
                 throw new RuntimeException("Server did not support partial request");
             }
+            if (listener != null) {
+                listener.onPartStarted(part.partId(), part.getLength());
+            }
             copyToFile(res.body());
             return true;
         }
@@ -55,7 +58,7 @@ public class DownloadWorker implements Callable<Boolean>{
            while((i =input.read(buffer))!=-1){
                file.write(buffer,0,i);
                if(listener!=null){
-                   listener.onProgress(i);
+                   listener.onProgress(part.partId(),i);
                }
            }
            if(listener!=null){
