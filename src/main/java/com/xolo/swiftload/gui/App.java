@@ -7,16 +7,20 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.io.File;
 
 public class App extends Application {
     private VBox threadContainer;
+    private Path selectedDownloadPath;
 
     @Override
     public void start(Stage primaryStage) {
@@ -47,6 +51,29 @@ public class App extends Application {
 
         Label statusLabel = new Label("Status: Idle");
 
+        Label downloadPathLabel = new Label("Download Location:");
+        Label pathDisplayLabel = new Label("downloads");
+        pathDisplayLabel.setStyle("-fx-text-fill: #0078d4;");
+        Button browseBtn = new Button("Browse");
+        browseBtn.setPrefWidth(80);
+        HBox pathSelectBox = new HBox(10, downloadPathLabel, pathDisplayLabel, browseBtn);
+        pathSelectBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        selectedDownloadPath = Paths.get("downloads");
+
+        browseBtn.setOnAction(_ -> {
+            DirectoryChooser dirChooser = new DirectoryChooser();
+            dirChooser.setTitle("Select Download Folder");
+            File defaultDir = Files.exists(selectedDownloadPath)
+                ? selectedDownloadPath.toFile() 
+                : new File(System.getProperty("user.home"));
+            dirChooser.setInitialDirectory(defaultDir);
+            File selected = dirChooser.showDialog(primaryStage);
+            if (selected != null) {
+                selectedDownloadPath = selected.toPath();
+                pathDisplayLabel.setText(selectedDownloadPath.toString());
+            }
+        });
+
         threadContainer = new VBox(5);
         ScrollPane scrollPane = new ScrollPane(threadContainer);
         scrollPane.setFitToWidth(true);
@@ -59,6 +86,7 @@ public class App extends Application {
         layout.getChildren().addAll(
                 urlLabel, urlField,
                 threadLabel, threadSlider,
+                pathSelectBox,
                 startBtn, progressBar, statusLabel,
                 scrollPane
         );
@@ -72,7 +100,6 @@ public class App extends Application {
         startBtn.setOnAction(_ -> {
             String url = urlField.getText();
             int threads = (int) threadSlider.getValue();
-            Path downloadDir = Paths.get("downloads");
             threadContainer.getChildren().clear();
             startBtn.setDisable(true);
             statusLabel.setText("Status: Starting download");
@@ -80,10 +107,10 @@ public class App extends Application {
             DownloadListener listener = new DownloadUiListener(threadContainer, progressBar, statusLabel);
             new Thread(() -> {
                 try {
-                    if (!Files.exists(downloadDir)) {
-                        Files.createDirectories(downloadDir);
+                    if (!Files.exists(selectedDownloadPath)) {
+                        Files.createDirectories(selectedDownloadPath);
                     }
-                    DownloadManager manager = new DownloadManager(url, downloadDir, threads, listener);
+                    DownloadManager manager = new DownloadManager(url, selectedDownloadPath, threads, listener);
                     manager.start();
                     Platform.runLater(() -> {
                         statusLabel.setText("Status: Finished");
