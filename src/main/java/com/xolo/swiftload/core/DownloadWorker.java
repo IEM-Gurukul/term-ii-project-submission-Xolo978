@@ -58,7 +58,9 @@ public class DownloadWorker implements Callable<Boolean>{
                    listener.onProgress(i);
                }
            }
-           listener.onComplete(part.partId());
+           if(listener!=null){
+               listener.onComplete(part.partId());
+           }
 
         }
     }
