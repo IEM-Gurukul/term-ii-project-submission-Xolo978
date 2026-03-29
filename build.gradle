@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.1.0'
+    id 'com.gradleup.shadow' version '9.4.1'
 }
 
 repositories {
@@ -13,7 +14,23 @@ javafx {
     modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
 
+shadowJar {
+    archiveClassifier.set('all')
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'com.xolo.swiftload.Main',
+                'Enable-Native-Access': 'ALL-UNNAMED'
+        )
+    }
+}
+
 dependencies {
+    runtimeOnly 'org.openjfx:javafx-graphics:21.0.2:win'
+    runtimeOnly 'org.openjfx:javafx-graphics:21.0.2:linux'
+
     testImplementation 'org.junit.jupiter:junit-jupiter:6.0.3'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:6.0.2'
 }

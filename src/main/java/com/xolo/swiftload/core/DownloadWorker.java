@@ -52,7 +52,6 @@ public class DownloadWorker implements Callable<Boolean>{
     public void copyToFile(InputStream input) throws IOException {
         try(RandomAccessFile file = new RandomAccessFile(savePath.toFile(),"rw")){
            file.seek(part.startByte());
-           //TODO: Optimize buffer size dynamically for large files
            byte[] buffer = new byte[8192];
            int i;
            while((i =input.read(buffer))!=-1){
